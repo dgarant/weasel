@@ -1,0 +1,120 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> start
+Rule 1     start -> put
+Rule 2     start -> exec
+Rule 3     start -> ping
+Rule 4     put -> PUT STRING FILESTR
+Rule 5     exec -> EXEC STRING
+Rule 6     ping -> PING
+Rule 7     createuser -> CREATEUSER STRING STRING
+
+Terminals, with rules where they appear
+
+CREATEUSER           : 7
+EXEC                 : 5
+FILESTR              : 4
+PING                 : 6
+PUT                  : 4
+STRING               : 4 5 7 7
+error                : 
+
+Nonterminals, with rules where they appear
+
+createuser           : 
+exec                 : 2
+ping                 : 3
+put                  : 1
+start                : 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . start
+    (1) start -> . put
+    (2) start -> . exec
+    (3) start -> . ping
+    (4) put -> . PUT STRING FILESTR
+    (5) exec -> . EXEC STRING
+    (6) ping -> . PING
+
+    PUT             shift and go to state 1
+    EXEC            shift and go to state 4
+    PING            shift and go to state 3
+
+    put                            shift and go to state 7
+    start                          shift and go to state 6
+    ping                           shift and go to state 5
+    exec                           shift and go to state 2
+
+state 1
+
+    (4) put -> PUT . STRING FILESTR
+
+    STRING          shift and go to state 8
+
+
+state 2
+
+    (2) start -> exec .
+
+    $end            reduce using rule 2 (start -> exec .)
+
+
+state 3
+
+    (6) ping -> PING .
+
+    $end            reduce using rule 6 (ping -> PING .)
+
+
+state 4
+
+    (5) exec -> EXEC . STRING
+
+    STRING          shift and go to state 9
+
+
+state 5
+
+    (3) start -> ping .
+
+    $end            reduce using rule 3 (start -> ping .)
+
+
+state 6
+
+    (0) S' -> start .
+
+
+
+state 7
+
+    (1) start -> put .
+
+    $end            reduce using rule 1 (start -> put .)
+
+
+state 8
+
+    (4) put -> PUT STRING . FILESTR
+
+    FILESTR         shift and go to state 10
+
+
+state 9
+
+    (5) exec -> EXEC STRING .
+
+    $end            reduce using rule 5 (exec -> EXEC STRING .)
+
+
+state 10
+
+    (4) put -> PUT STRING FILESTR .
+
+    $end            reduce using rule 4 (put -> PUT STRING FILESTR .)
+

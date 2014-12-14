@@ -1,0 +1,17 @@
+<html>
+<head> 
+    <title>Weasel Login</title> 
+    <link rel="stylesheet" type="text/css" href="../static/css/login.css" />
+</head>
+<body>
+    <div id="form">
+        <h1>Weasel</h1>
+        <FORM ACTION="login" METHOD=POST>
+        <input type="password" name="password"><br>
+        {% if error %}
+            <font color="red">{{ error }}</font>
+        {% endif %}
+        </FORM>
+    </div>
+</body>
+</html>

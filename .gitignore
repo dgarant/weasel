@@ -52,3 +52,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# weasel-specific ignores
+*.key
+weasel.conf

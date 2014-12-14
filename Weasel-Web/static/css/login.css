@@ -1,0 +1,20 @@
+html {
+
+background: #ADADAD;
+
+}
+
+
+#form {
+    text-align: center;
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    width:15em;
+    height:9em;
+    margin-top: -4.5em; /*set to a negative number 1/2 of your height*/
+    margin-left: -7.5em; /*set to a negative number 1/2 of your width*/
+    border-style: solid;
+    border-width: 3px;
+    border-color: #000000;
+}

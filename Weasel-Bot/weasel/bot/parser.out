@@ -1,0 +1,149 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> start
+Rule 1     start -> put
+Rule 2     start -> exec
+Rule 3     start -> execsh
+Rule 4     start -> ping
+Rule 5     put -> PUT STRING FILESTR
+Rule 6     exec -> EXEC STRING
+Rule 7     execsh -> EXECSH STRING
+Rule 8     ping -> PING
+Rule 9     createuser -> CREATEUSER STRING STRING
+
+Terminals, with rules where they appear
+
+CREATEUSER           : 9
+EXEC                 : 6
+EXECSH               : 7
+FILESTR              : 5
+PING                 : 8
+PUT                  : 5
+STRING               : 5 6 7 9 9
+error                : 
+
+Nonterminals, with rules where they appear
+
+createuser           : 
+exec                 : 2
+execsh               : 3
+ping                 : 4
+put                  : 1
+start                : 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . start
+    (1) start -> . put
+    (2) start -> . exec
+    (3) start -> . execsh
+    (4) start -> . ping
+    (5) put -> . PUT STRING FILESTR
+    (6) exec -> . EXEC STRING
+    (7) execsh -> . EXECSH STRING
+    (8) ping -> . PING
+
+    PUT             shift and go to state 2
+    EXEC            shift and go to state 6
+    EXECSH          shift and go to state 3
+    PING            shift and go to state 5
+
+    put                            shift and go to state 9
+    start                          shift and go to state 8
+    execsh                         shift and go to state 1
+    ping                           shift and go to state 7
+    exec                           shift and go to state 4
+
+state 1
+
+    (3) start -> execsh .
+
+    $end            reduce using rule 3 (start -> execsh .)
+
+
+state 2
+
+    (5) put -> PUT . STRING FILESTR
+
+    STRING          shift and go to state 10
+
+
+state 3
+
+    (7) execsh -> EXECSH . STRING
+
+    STRING          shift and go to state 11
+
+
+state 4
+
+    (2) start -> exec .
+
+    $end            reduce using rule 2 (start -> exec .)
+
+
+state 5
+
+    (8) ping -> PING .
+
+    $end            reduce using rule 8 (ping -> PING .)
+
+
+state 6
+
+    (6) exec -> EXEC . STRING
+
+    STRING          shift and go to state 12
+
+
+state 7
+
+    (4) start -> ping .
+
+    $end            reduce using rule 4 (start -> ping .)
+
+
+state 8
+
+    (0) S' -> start .
+
+
+
+state 9
+
+    (1) start -> put .
+
+    $end            reduce using rule 1 (start -> put .)
+
+
+state 10
+
+    (5) put -> PUT STRING . FILESTR
+
+    FILESTR         shift and go to state 13
+
+
+state 11
+
+    (7) execsh -> EXECSH STRING .
+
+    $end            reduce using rule 7 (execsh -> EXECSH STRING .)
+
+
+state 12
+
+    (6) exec -> EXEC STRING .
+
+    $end            reduce using rule 6 (exec -> EXEC STRING .)
+
+
+state 13
+
+    (5) put -> PUT STRING FILESTR .
+
+    $end            reduce using rule 5 (put -> PUT STRING FILESTR .)
+

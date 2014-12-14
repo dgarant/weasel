@@ -53,6 +53,10 @@ docs/_build/
 # PyBuilder
 target/
 
+#py dev
+.project
+.pydevproject
+
 # weasel-specific ignores
 *.key
 weasel.conf

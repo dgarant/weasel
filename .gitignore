@@ -60,3 +60,7 @@ target/
 # weasel-specific ignores
 *.key
 weasel.conf
+*.s3db
+parser.out
+*.crt
+parsetab.py

@@ -6,6 +6,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 from ConfigParser import ConfigParser
+import os
 
 class EngineConfig:
     """ Object representation of configuration 
@@ -22,6 +23,11 @@ class EngineConfig:
         self.db_catalog = config_parser.get('database', 'catalog' )
         self.db_user = config_parser.get('database', 'user')
         self.db_pass = config_parser.get('database', 'password')
+        self.key_file = config_parser.get("security", "key_file")
+        if config_parser.has_option("storage", "root_dir"):
+            self.root_dir = config_parser.get("storage", "root_dir")
+        else:
+            self.root_dir = os.environ["WEASEL_ROOT"]
     
     def __str__(self):
         """ Returns a string representation of the configuration information"""

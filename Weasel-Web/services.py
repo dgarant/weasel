@@ -1,23 +1,27 @@
 import flask, os
 from flask import Flask, request, render_template, flash, redirect
-from flask.ext.login import LoginManager, login_required, login_user
+from flask_login import LoginManager, login_required, login_user
+import sys
+
+application = Flask(__name__)
+WEASEL_ROOT = os.environ["WEASEL_ROOT"]
+DEBUG=True
+
+sys.path.append(WEASEL_ROOT)
 from weasel.engine.manager import BotManager
 from weasel.shared.config import EngineConfig
 from weasel.engine.dbmanager import DatabaseManager
 from weasel.engine.accounts import AccountManager, User
-import sys, logging
+
+config = EngineConfig(os.path.join(WEASEL_ROOT, "weasel.conf"))
 
 def read_private_key(config):
     """ Reads the private key required for secure sessions"""
-    with open(config.key_file, 'r') as key_file:
+    with open(os.path.join(WEASEL_ROOT, config.key_file), 'r') as key_file:
         lines = key_file.readlines()
         return lines[2]
 
-logging.basicConfig()
-application = Flask(__name__)
-config = EngineConfig("/home/dan/Dropbox/Weasel/weasel.conf")
-#application.secret_key = read_private_key(config)
-application.secret_key="MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDPCC/0p+BDckEmFRdcdun9lWFt09P6jjYBC9iCsnfZSgdA34ADb3EDEWsTnFl6ATGq3XlGxkY1lHX8quq1coHtB6eUzlNZo1kZrQtrPU5EVCDPtgAkTv4MPlCl7Z61IxWKWW8vKk9uHUUuygxvhOO/w0FpcGSKL19vtQDo8FunYxr+29COXnKcSafbcY9/8SpUG5XVY5TPZ1QwUngHgdwvbJzdjnpegQ1fgAbBwv/CqXxx5/zPL0EcWabyDt/9o2GtO0GxB+RneHpIOf5qczDR6GxsEzbyji/zlsIOJ1YOkjk23MtRZJdHzzUWPo2dfAFZ6lrbK1Ohu8Qo0kXTXbu1AgMBAAECggEBAJL8TBfWDEm2V3yzIrfaETyhjt+LsgdEaiEKCPiZvq89eLLdOyS1PTYharUsnvYY3OtjfFP8NyKZOb9elW6nUok3kwn6BoEwkPTCv8Wua9/lHrp5i9Y7YvDMWTPE5ZXSx9tGrcJ9tpEGJPUYLAYNAilGdi1mx2q4QXisuG2pIFlQoiYNqw6bzAi5NWGBS7CRqg+GpXcgNzRXa+a51Gt92E0g60xWTEGg3e6xLy+5HQmp/KdgcfaFGGLKGmFMD4wsF57lrizrpX6zUSzgDBl6El7dK4Z19hcVwGN6KxsTDhhdzeIYnwFFP+g/5S5moc6ZaQT/cucpI4d0w6od4eFacWECgYEA/N+ggcIAbV+vCDEKPM24wT3Fjb2EcIy7+4YHcPmjIpYoJ+w/QkhR0J6HTHsFpcROP79aiQCkkgscWKBfjcn1AKpi2KCAVlhWpRvgccJhKmatbLm8xtc/cnWKMY5i2R6kfAku2cCIVWZZUSvz026qeLoKplF6Y8dWHHnB++G5rI0CgYEA0Zd3eJFLLwsL8PEjbY6ypjUSUFAi5AnllUYZQCsIzKyRKDYJVesqBLU5a5DmEp+igIYAtIr6P0/98dF0P2DhslzpGO+6V1F/ZkOT6gnEe0OXaxi8t06dNNKjb4ISbBJJ80CJkG9kAX/sUTnpXRxXfdxG8buOGEXLHwheQcWwhckCgYEA6ViDCLo5IrS1E94NEGbWIpwZ/N3xpNp5bXUU0M/MFlJx48VB6qxJszVWrOCpKXqoqnKt3NbXBl1yXuY+xtyiVWblp/kT9Jm3+sxqpQ82EqaFSltrNCHUzo5gY7J8zNZV+o+OyCm+pO+5ZAonCeiJLraetTNiuUhs0gIZW5HEgNECgYAxT5yZLj3tHIE7t9ApB4i6mAPuB1yeIEH2o95u/XD9jqA8QLJjl4d0Qhr3Vsj6mrpF2MEzuPr1iGFr0mayPp37M+bXqhdCUfdSXRXg21lx0s4+MTy9N+6+rcwsAQNKj+b8JzP2Wm7B95Hm7mQcNv3Sq8+5MfJVfZ4zd+mNOfC1GQKBgCDogZGAhbwXMbGQiah14iShaWqtwj5bUWgwXCSEuiCkWLt/Z23mcG569Mb+3+kC0lIvO2xBy9a2fc1I1cRMJ4QSh4k/2aCu547H5JCm7Hw2VGyhKLm8x7Q67p2ZBhgFnCTzWDhVU/FbuRaVrXnANuNxCFaF/97a6l9xED9YfaQH"
+application.secret_key = read_private_key(config)
 
 act_mgr = AccountManager(config)
 bot_mgr = BotManager(config)

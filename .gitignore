@@ -64,3 +64,4 @@ weasel.conf
 parser.out
 *.crt
 parsetab.py
+Weasel-Bot/weasel/bot/scripts

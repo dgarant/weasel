@@ -53,7 +53,7 @@ class AccountManager:
     def drop_user(self, ip):
         """ Remove a user from the account table"""
         try:
-            self.db_mgr.exec_cmd('''delete from account where ip=%s''', ip)
+            self.db_mgr.exec_cmd('''delete from account where ip=?''', ip)
         except DBError, e:
             print("Error occurred while deleting account for {0}".format(ip))
             raise e
@@ -82,7 +82,7 @@ class AccountManager:
         """
         try:
             rows = self.db_mgr.exec_query('''select hash, salt from account
-                                      where ip=%s''', ip)
+                                      where ip=?''', ip)
         except DBError, e:
             print("An error occurred obtaining auth info for ip {0}".format(ip))
             raise e
@@ -113,7 +113,7 @@ class AccountManager:
         """ Creates a new account in the auth table """
         salt, pwhash = self.generate_salted_pass(password)
         try:
-            self.db_mgr.exec_cmd('''insert into account (ip, hash, salt) values (%s, %s, %s)''', ip, pwhash, salt)
+            self.db_mgr.exec_cmd('''insert into account (ip, hash, salt) values (?, ?, ?)''', ip, pwhash, salt)
         except DBError, e:
             print("An error occurred while creating an account for ip {0}: {1}".format(ip, e.args[0]))
             raise e
@@ -138,7 +138,7 @@ class AccountManager:
         if self.test_authentication(ip, old_pass):
             salt, pwhash = self.generate_salted_pass(new_pass)
             try:
-                self.db_mgr.exec_cmd('''update account set hash = %s, salt = %s where ip = %s ''', pwhash, salt, ip)
+                self.db_mgr.exec_cmd('''update account set hash = ?, salt = ? where ip = ? ''', pwhash, salt, ip)
             except DBError, e:
                 print("An error occurred while updating the password for ip {0}: {1}".format(ip, e.args[0]))
                 raise e

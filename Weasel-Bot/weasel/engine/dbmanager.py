@@ -1,6 +1,7 @@
-import psycopg2
+import sqlite3
+import os
 
-DBError = psycopg2.Error
+DBError = sqlite3.Error
 
 class DatabaseManager:
     """ Manages SQL operations on the Weasel database """
@@ -11,8 +12,7 @@ class DatabaseManager:
             Keyword arguments:
             config -- The EngineConfig instance to use 
         """
-        self.db_conn = psycopg2.connect(host=config.db_host, database=config.db_catalog, 
-                                        user=config.db_user, password=config.db_pass)
+        self.db_conn = sqlite3.connect(os.path.join(config.root_dir, config.db_catalog))
 
     def shutdown(self):
         """ Closes the database connection and decommits any active transactions"""
@@ -49,12 +49,15 @@ class DatabaseManager:
                         should be treated as an insert statement and the id of the last 
                         inserted row should be returned.
         """
-        lastrow = None
+        return_item = None
         c = self.db_conn.cursor()
         try:
            c.execute(command, args) 
            if 'lastrow' in kwargs and kwargs['lastrow']:
-               lastrow = c.fetchone()[0]
+               return_item = c.fetchone()[0]
+           if "lastrowid" in kwargs and kwargs["lastrowid"]:
+               return_item = c.lastrowid
+
            if 'commit' in kwargs:
                if kwargs['commit']:
                    self.db_conn.commit()
@@ -64,5 +67,6 @@ class DatabaseManager:
            raise e 
         finally:
             c.close()
-        return lastrow
+
+        return return_item
     

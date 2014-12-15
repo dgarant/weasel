@@ -73,10 +73,10 @@ class WeaselShell(cmd.Cmd):
         """
         try:
             ip, junk, password = line.partition(' ')
-            success, failed = self.act_mgr.create_new_account(ip, password)
+            self.act_mgr.create_new_account(ip, password)
             print("Created user {0}".format(ip))
-            print("Success {0} Failure {1}".format(success, failed))
         except Exception as e:
+            traceback.print_exc()
             sys.stderr.write("Error {0}\n".format(e))
             
 

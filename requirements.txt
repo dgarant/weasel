@@ -1,0 +1,6 @@
+ply
+flask
+flask-login
+pyOpenSSL
+psycopg2
+

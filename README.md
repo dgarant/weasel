@@ -1,7 +1,10 @@
 weasel
 ======
 
-A platform for remote code execution to facilitate network security research
+A platform for remote code execution to facilitate network security research. 
+Weasel is for *research*, and so it does not include any remote deployment exploits.
+Instead, the researcher must manually deploy "bot" code to a set of machines under study.
+
 
 Setup Instructions
 -----------------
